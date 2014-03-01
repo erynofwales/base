@@ -142,10 +142,10 @@ release_env = create_env('release', [src_dir], {
 })
 
 test_gtest_dir = Dir('#lib/gtest')
-test_cpppath = test_gtest_dir.Dir('include')
+test_gtest_include = test_gtest_dir.Dir('include')
 test_env = create_env('test', [src_dir, test_dir, test_gtest_dir], {
     'CPPDEFINES': ['DEBUG'],
-    'CPPPATH': [test_cpppath],
+    'CPPPATH': [test_gtest_include],
     'LIBPATH': [test_gtest_dir],
     'CFLAGS': debug_cflags,
     'CXXFLAGS': debug_cflags,

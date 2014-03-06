@@ -32,72 +32,20 @@ import os.path
 import SCons.Errors
 
 
-def which(program):
-    def is_executable(path):
-        return os.path.exists(path) and os.access(path, os.X_OK)
-
-    path, name = os.path.split(program)
-    if path:
-        if is_executable(program):
-            return program
-    else:
-        pathext = [''] + os.environ.get('PATHEXT', '').split(os.pathsep)
-        for path in os.environ.get('PATH', '').split(os.pathsep):
-            exe = os.path.join(path, program)
-            for ext in pathext:
-                candidate = exe + ext
-                if is_executable(candidate):
-                    return candidate
-    return None
-
-
-def get_bool_argument(arg):
-    try:
-        return bool(int(arg))
-    except ValueError:
-        pass
-    if arg in ('False', 'FALSE', 'false', ''):
-        return False
-    return True
-
-
-def set_toolchain_binary(env, var, user_binary, binaries=()):
-    if user_binary and which(user_binary):
-        env[var] = user_binary
-        return
-    for c in binaries:
-        if which(c):
-            env[var] = c
-            break
-
-common_env = Environment()
-set_toolchain_binary(common_env, 'CC', CC, ('clang', 'gcc'))
-set_toolchain_binary(common_env, 'CXX', CXX, ('clang++', 'g++'))
-set_toolchain_binary(common_env, 'AS', AS)
-set_toolchain_binary(common_env, 'LINK', LINK)
-common_env.Append(CFLAGS='{} -std=c99'.format(CFLAGS))
-common_env.Append(CXXFLAGS='{} -std=c++11'.format(CFLAGS))
-
-# Add color error messages for clang
-if 'clang' in common_env['CC']:
-    common_env.Append(CFLAGS=' -fcolor-diagnostics')
-if 'clang' in common_env['CXX']:
-    common_env.Append(CXXFLAGS=' -fcolor-diagnostics')
-
-BUILD_CMDS = get_bool_argument(ARGUMENTS.get('BUILD_CMDS', False))
-if not BUILD_CMDS:
-    def generate_comstr(action):
-        return '{:>25}: $TARGET'.format(action)
-    common_env['ARCOMSTR'] = generate_comstr('Archiving')
-    common_env['ASCOMSTR'] = generate_comstr('Assembling')
-    common_env['ASPPCOMSTR'] = generate_comstr('Assembling')
-    common_env['CCCOMSTR'] = generate_comstr('Building (C)')
-    common_env['CXXCOMSTR'] = generate_comstr('Building (C++)')
-    common_env['LINKCOMSTR'] = generate_comstr('Linking')
-    common_env['RANLIBCOMSTR'] = generate_comstr('Indexing')
-    common_env['SHCCCOMSTR'] = generate_comstr('Building (C, Shared)')
-    common_env['SHCXXCOMSTR'] = generate_comstr('Building (C++, Shared)')
-    common_env['SHLINKCOMSTR'] = generate_comstr('Linking (Shared)')
+if not GetOption('build_cmds'):
+    def comstr(action):
+        return '{:>18}: $TARGET'.format(action)
+    default_env = DefaultEnvironment()
+    default_env['ARCOMSTR'] = comstr('Archiving')
+    default_env['ASCOMSTR'] = comstr('Assembling')
+    default_env['ASPPCOMSTR'] = comstr('Assembling')
+    default_env['CCCOMSTR'] = comstr('Building (C)')
+    default_env['CXXCOMSTR'] = comstr('Building (C++)')
+    default_env['LINKCOMSTR'] = comstr('Linking')
+    default_env['RANLIBCOMSTR'] = comstr('Indexing')
+    default_env['SHCCCOMSTR'] = comstr('Building (C)')
+    default_env['SHCXXCOMSTR'] = comstr('Building (C++)')
+    default_env['SHLINKCOMSTR'] = comstr('Linking (Shared)')
 
 build_dir = Dir('#build')
 lib_dir = Dir('#lib')
@@ -107,7 +55,7 @@ test_dir = Dir('#test')
 
 def create_env(name, src_dirs, appends=None):
     output_dir = build_dir.Dir(name)
-    env = common_env.Clone()
+    env = DefaultEnvironment().Clone()
     env['__name'] = name
     env['__build_dir'] = output_dir
     env['__src_dirs'] = []

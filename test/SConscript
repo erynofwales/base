@@ -23,3 +23,5 @@ files = [
 objs = []
 for f in files:
     objs.append(env.Object(f))
+
+env.GTestProgram('test_hello', 'test_hello.cc')

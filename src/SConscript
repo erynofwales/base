@@ -18,8 +18,15 @@ for d in subdirs:
 
 files = [
     # TODO: Put files here.
+    #'hello.cc',
 ]
 
 objs = []
 for f in files:
     objs.append(env.Object(f))
+
+#lib = env.Library('hello', files)
+#prog = env.Program('hello', lib)
+lib = None
+prog = None
+Return('prog lib')

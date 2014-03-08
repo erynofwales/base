@@ -1,0 +1,24 @@
+# SConscript
+#
+# SCons build script for libs in base. Aggregates static and shared libraries in
+# these directories and exports them in the 'LIBS' variable.
+#
+# Eryn Wells <eryn@erynwells.me>
+
+
+Import('env')
+
+dirs = (
+    'gtest',
+)
+
+env['LIBS'] = {}
+for d in dirs:
+    static, dynamic = env.SConscript(Dir(d).File('SConscript'), {
+        'env': env,
+    })
+    env['LIBS'][d] = {}
+    if static:
+        env['LIBS'][d]['static'] = static
+    if dynamic:
+        env['LIBS'][d]['dynamic'] = dynamic

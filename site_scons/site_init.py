@@ -7,13 +7,8 @@
 
 import os.path
 import SCons.Defaults
-import binaries
+from dirs import *
 
-
-BUILD_DIR = Dir('#build')
-LIB_DIR = Dir('#lib')
-SRC_DIR = Dir('#src')
-TEST_DIR = Dir('#test')
 
 #
 # Environment Configuration
@@ -22,11 +17,15 @@ TEST_DIR = Dir('#test')
 def has_clang(env):
     _, cc_tail = os.path.split(env['CC'])
     _, cxx_tail = os.path.split(env['CXX'])
-    return any([cc_tail.startswith('clang'), cxx_tail.startswith('clang')])
+    return all([cc_tail.startswith('clang'), cxx_tail.startswith('clang')])
 
 default_env = SCons.Defaults.DefaultEnvironment()
-default_env.Replace(CC=binaries.first(['clang', 'gcc']),
-                    CXX=binaries.first(['clang++', 'g++']))
+default_env.Append(TOOLS=['gtest'])
+print default_env.Dump()
+
+default_env.Replace(
+    CC=default_env.WhereIs('clang') or default_env.WhereIs('gcc'),
+    CXX=default_env.WhereIs('clang++') or default_env.WhereIs('gcc++'))
 
 default_env.Append(CCFLAGS=['-Wall', '-Wextra', '-pedantic'],
                    CFLAGS=['-std=c99'],

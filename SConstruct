@@ -59,8 +59,22 @@ for mode in GetOption('modes'):
         env = MODES[mode]
     except KeyError:
         print 'Skipping invalid mode: {}'.format(mode)
+
+    # Process libraries
+    env.SConscript(LIB_DIR.File('SConscript'), {
+        'env': env,
+    }, variant_dir=BUILD_DIR.Dir(env['MODE']).Dir('lib'), duplicate=0)
+
+    # Process source
     library, binary = env.SConscript(SRC_DIR.File('SConscript'), {
         'env': env
     }, variant_dir=BUILD_DIR.Dir(env['MODE']).Dir('src'), duplicate=0)
     env.Alias('lib', library)
     env.Alias('bin', binary)
+
+    env.SConscript(TEST_DIR.File('SConscript'), {
+        'env': env,
+    }, variant_dir=BUILD_DIR.Dir(env['MODE']).Dir('test'), duplicate=0)
+
+Import('LIBS')
+print LIBS

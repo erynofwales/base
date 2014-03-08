@@ -25,4 +25,6 @@ for f in files:
 
 env.Append(CPPPATH=[Dir('include').srcnode()])
 
-gtest = env.Library('gtest', objs)
+gtest_static = env.Library('gtest', [env.StaticObject(f) for f in files])
+gtest_dynamic = None
+Return('gtest_static gtest_dynamic')

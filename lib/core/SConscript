@@ -1,0 +1,4 @@
+# SConscript
+# Eryn Wells <eryn@erynwells.me>
+
+Library('erw', ['src/File.cc'])

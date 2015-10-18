@@ -10,16 +10,37 @@
 
 
 namespace erw {
-namespace core {
 
 #pragma mark - File
 
+/*
+ * File::File --
+ */
+File::File(const String& path)
+    : mPath(path)
+{ }
+
+
+/*
+ * File::~File --
+ */
 File::~File()
 { }
 
 
 /*
- * InFile::modeToIOSMode --
+ * File::path --
+ */
+String
+File::path()
+    const noexcept
+{
+    return mPath;
+}
+
+
+/*
+ * File::modeToIOSMode --
  */
 std::ios_base::openmode
 File::modeToIOSMode(Mode mode)
@@ -44,7 +65,8 @@ File::modeToIOSMode(Mode mode)
  */
 InFile::InFile(const String& path,
                InFile::Mode mode)
-    : mStream(path, modeToIOSMode(mode))
+    : File(path),
+      mStream(path, modeToIOSMode(mode))
 { }
 
 
@@ -52,7 +74,8 @@ InFile::InFile(const String& path,
  * InFile::InFile --
  */
 InFile::InFile(InFile&& other)
-    : mStream(std::move(other.mStream))
+    : File(other.mPath),
+      mStream(std::move(other.mStream))
 { }
 
 
@@ -136,5 +159,4 @@ InFile::modeToIOSMode(File::Mode mode)
 
 #pragma mark - OutFile
 
-} /* namespace core */
 } /* namespace erw */

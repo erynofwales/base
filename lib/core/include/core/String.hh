@@ -10,9 +10,7 @@
 
 
 namespace erw {
-namespace core {
 
 typedef std::string String;
 
-} /* namespace core */
 } /* namespace erw */

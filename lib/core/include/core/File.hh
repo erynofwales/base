@@ -14,7 +14,6 @@
 
 
 namespace erw {
-namespace core {
 
 struct File
 {
@@ -36,6 +35,8 @@ struct File
     /** Destructor. */
     virtual ~File();
 
+    String path() const noexcept;
+
     /** Seek to an absolute position in the file. */
     virtual File& seek(size_t pos) = 0;
 
@@ -46,8 +47,12 @@ struct File
     virtual File& seek(ssize_t offset, SeekFrom from) = 0;
 
 protected:
+    const String mPath;
+
     /** Convert a File::Mode to an iostream openmode bitset. */
     virtual std::ios_base::openmode modeToIOSMode(Mode mode);
+
+    File(const String& path);
 };
 
 
@@ -57,7 +62,7 @@ struct InFile
 {
     /** Open a file at `path` for reading. */
     InFile(const String& path, File::Mode mode);
-    
+
     /** Deleted copy constructor. File handles cannot be copied. */
     InFile(const InFile& other) = delete;
 
@@ -69,6 +74,8 @@ struct InFile
     /** Move `other` to this InFile. File handles cannot be copied. */
     InFile& operator=(InFile& other);
 
+    String path() const;
+
     /** Read up to `count` characters into the provided `buffer`. */
     InFile& read(char* buffer, ssize_t count);
 
@@ -79,6 +86,7 @@ struct InFile
     InFile& seek(ssize_t pos, File::SeekFrom from) override;
 
 private:
+    String mPath;
     std::ifstream mStream;
 
     std::ios_base::openmode modeToIOSMode(File::Mode mode) override;
@@ -101,5 +109,4 @@ private:
     std::ofstream stream;
 };
 
-} /* namespace core */
 } /* namespace erw */
